@@ -63,3 +63,8 @@ svg {
 button:hover {
   cursor: pointer;
 }
+
+button label {
+  vertical-align: middle;
+  font-size: 13px;
+}

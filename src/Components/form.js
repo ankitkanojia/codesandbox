@@ -1,12 +1,15 @@
+import { FaSave } from "react-icons/fa";
+
 export default function UserForm({
   simpleValidator,
   user,
   onValueChange,
-  submitForm
+  submitForm,
+  mode
 }) {
   return (
     <>
-      <b>Add New User</b>
+      <b>{mode === "add" ? "Add New" : "Update"} User</b>
       <p>
         <label>Name: </label>
         <input
@@ -52,7 +55,7 @@ export default function UserForm({
         </span>
       </p>
       <button type="button" onClick={submitForm}>
-        Submit
+        <FaSave /> <label>Submit</label>
       </button>
     </>
   );

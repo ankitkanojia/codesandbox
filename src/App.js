@@ -165,6 +165,7 @@ function App() {
               user={user}
               onValueChange={onValueChange}
               submitForm={submitForm}
+              mode={mode}
             />
           }
           handleClose={togglePopup}
