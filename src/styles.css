@@ -9,6 +9,10 @@
   width: 100%;
 }
 
+#users th {
+  background-color: #f2f2f2;
+}
+
 #users td,
 #users th {
   border: 1px solid #ddd;
@@ -28,11 +32,10 @@
   padding-top: 12px;
   padding-bottom: 12px;
   text-align: left;
-  background-color: #04aa6d;
+  background-color: #6c7773;
   color: white;
 }
 
-.btnUndo,
 button {
   background-color: #007bff;
   border-color: #007bff;
@@ -46,53 +49,17 @@ button {
   -ms-user-select: none;
   user-select: none;
   border: 1px solid transparent;
-  padding: 0.2rem 0.75rem;
   font-size: 0.8rem;
-  line-height: 1.5;
   border-radius: 0.25rem;
   color: white;
-  margin-bottom: 10px;
+  margin: 5px;
 }
 
-.btnDelete {
-  background-color: #dc3545;
-  border-color: #dc3545;
-  display: inline-block;
-  font-weight: 400;
-  text-align: center;
-  white-space: nowrap;
+svg {
   vertical-align: middle;
-  -webkit-user-select: none;
-  -moz-user-select: none;
-  -ms-user-select: none;
-  user-select: none;
-  border: 1px solid transparent;
-  padding: 0.2rem 0.75rem;
-  font-size: 0.8rem;
-  line-height: 1.5;
-  border-radius: 0.25rem;
-  color: white;
-  margin-bottom: 10px;
+  padding: 5px;
 }
 
-.btnPopup {
-  background-color: green;
-  border-color: green;
-  display: inline-block;
-  font-weight: 400;
-  text-align: center;
-  white-space: nowrap;
-  vertical-align: middle;
-  -webkit-user-select: none;
-  -moz-user-select: none;
-  -ms-user-select: none;
-  user-select: none;
-  border: 1px solid transparent;
-  padding: 0.2rem 0.75rem;
-  font-size: 0.8rem;
-  line-height: 1.5;
-  border-radius: 0.25rem;
-  color: white;
-  margin-bottom: 10px;
-  margin-left: 5px;
+button:hover {
+  cursor: pointer;
 }

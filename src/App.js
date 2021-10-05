@@ -1,16 +1,25 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import "./styles.css";
 import Popup from "./Components/popup";
 import "./popup.css";
+import SimpleReactValidator from "simple-react-validator";
+import Table from "./Components/table";
+import Form from "./Components/form";
+import { FaUserPlus, FaUndo } from "react-icons/fa";
 
-const userObj = { name: "", username: "", email: "" };
+const userObj = { id: "", name: "", username: "", email: "", deleted: false };
 
 function App() {
+  // component state
+  const simpleValidator = useRef(new SimpleReactValidator());
   const [users, setUsers] = useState(false);
   const [deletedIds, setDeletedIds] = useState([]);
   const [isOpen, setIsOpen] = useState(false);
-  const [user, setUser] = useState(userObj);
+  const [user, setUser] = useState([]);
+  const [, forceUpdate] = useState();
+  const [mode, setMode] = useState("");
 
+  // Get user's records using API call
   useEffect(() => {
     //Fetch records from external API
     fetch("https://jsonplaceholder.typicode.com/users")
@@ -19,7 +28,7 @@ function App() {
         const updatedList = result.map((data) => {
           data.deleted = false;
           return {
-            id: data.id,
+            id: guidGenerator(),
             name: data.name,
             username: data.username,
             email: data.email,
@@ -30,8 +39,13 @@ function App() {
       });
   }, []);
 
+  // Generate random number
+  const guidGenerator = () => {
+    return (((1 + Math.random()) * 0x10000) | 0).toString(16).substring(1);
+  };
+
   // Delete Row Function
-  const DeleteRow = (id) => {
+  const deleteRecord = (id) => {
     if (window.confirm("Are you sure want to delete!")) {
       var userCollection = [...users];
       var updatedCollection = userCollection.filter((m) => m.id === id);
@@ -49,7 +63,7 @@ function App() {
   };
 
   // Undo deleted record Function
-  const UndoDeletion = () => {
+  const undoDeletion = () => {
     if (deletedIds && deletedIds.length > 0) {
       var userCollection = [...users];
       var deletedIdsCollection = [...deletedIds];
@@ -67,11 +81,17 @@ function App() {
     }
   };
 
-  const togglePopup = () => {
-    setUser(userObj);
+  // toggle Popup
+  const togglePopup = (mode, data) => {
+    if (!isOpen)
+      if (mode === "update") setUser(data);
+      else setUser(userObj);
+    resetValidation();
     setIsOpen(!isOpen);
+    setMode(mode);
   };
 
+  // Dynamic value configuration for form control
   const onValueChange = (event) => {
     event.preventDefault();
     setUser((prev) => ({
@@ -80,87 +100,81 @@ function App() {
     }));
   };
 
-  const submitForm = () => {};
+  // Reset validation
+  const resetValidation = () => {
+    simpleValidator.current.hideMessages();
+    forceUpdate(2);
+  };
+
+  // Submit Form
+  const submitForm = () => {
+    if (simpleValidator.current.allValid()) {
+      if (mode === "add") addRecord();
+      else updateRecord();
+      togglePopup();
+      setMode("");
+    } else {
+      simpleValidator.current.showMessages();
+      forceUpdate(1);
+    }
+  };
+
+  // Add new record method
+  const addRecord = () => {
+    setUsers((prevArray) => [
+      ...prevArray,
+      {
+        id: guidGenerator(),
+        name: user.name,
+        username: user.username,
+        email: user.email,
+        deleted: false
+      }
+    ]);
+  };
+
+  // Update existing record method
+  const updateRecord = () => {
+    setUsers(
+      users.map((prevArray) =>
+        prevArray.id === user.id
+          ? {
+              ...prevArray,
+              name: user.name,
+              username: user.username,
+              email: user.email
+            }
+          : prevArray
+      )
+    );
+  };
 
   return (
     <div>
-      <button className="btnUndo" onClick={UndoDeletion}>
-        Undo Deletion
+      <button onClick={undoDeletion}>
+        <FaUndo />
       </button>
-      <button className="btnPopup" onClick={togglePopup}>
-        Click to Open Popup
+      <button onClick={() => togglePopup("add")}>
+        <FaUserPlus />
       </button>
       {isOpen && (
         <Popup
           content={
-            <>
-              <b>Add New User</b>
-              <p>
-                <label>Name: </label>
-                <input
-                  onChange={(e) => onValueChange(e)}
-                  value={user.name}
-                  type="text"
-                  name="name"
-                />
-              </p>
-              <p>
-                <label>UserName: </label>
-                <input
-                  onChange={(e) => onValueChange(e)}
-                  value={user.username}
-                  type="text"
-                  name="username"
-                />
-              </p>
-              <p>
-                <label>Email: </label>
-                <input
-                  onChange={(e) => onValueChange(e)}
-                  value={user.email}
-                  type="text"
-                  name="email"
-                />
-              </p>
-              <button onSubmit={submitForm}>Submit</button>
-            </>
+            <Form
+              simpleValidator={simpleValidator}
+              user={user}
+              onValueChange={onValueChange}
+              submitForm={submitForm}
+            />
           }
           handleClose={togglePopup}
         />
       )}
-      <table id="users">
-        <thead>
-          <tr>
-            <td>ID</td>
-            <td>Name</td>
-            <td>User Name</td>
-            <td>Email</td>
-            <td>Action</td>
-          </tr>
-        </thead>
-        <tbody>
-          {users &&
-            users.map(
-              (data, index) =>
-                !data.deleted && (
-                  <tr key={index}>
-                    <td>{data.id}</td>
-                    <td>{data.name}</td>
-                    <td>{data.username}</td>
-                    <td>{data.email}</td>
-                    <td>
-                      <button
-                        className="btnDelete"
-                        onClick={() => DeleteRow(data.id)}
-                      >
-                        Delete Row
-                      </button>
-                    </td>
-                  </tr>
-                )
-            )}
-        </tbody>
-      </table>
+      <Table
+        users={users}
+        togglePopup={togglePopup}
+        deleteRecord={deleteRecord}
+      />
     </div>
   );
 }
