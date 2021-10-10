@@ -151,6 +151,7 @@ function App() {
 
   return (
     <div>
+      <h2>Code SandBox Example</h2>
       <button onClick={undoDeletion}>
         <FaUndo />
       </button>
